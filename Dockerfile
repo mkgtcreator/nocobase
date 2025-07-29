@@ -5,8 +5,8 @@ WORKDIR /app
 
 COPY . .
 
-# Instala dependências e faz o build
-RUN yarn install --frozen-lockfile && yarn build
+# Instala dependências (sem build ainda)
+RUN yarn install --frozen-lockfile
 
 # Etapa de produção
 FROM node:20-bookworm-slim
@@ -19,13 +19,13 @@ WORKDIR /app
 # Copia arquivos da etapa de build
 COPY --from=builder /app /app
 
-# ⚠️ NÃO use --production porque o NocoBase usa workspaces
+# Instala dependências no container de produção
 RUN yarn install --frozen-lockfile
 
-# ⚠️ ESSENCIAL — instala o app do NocoBase
+# ⚠️ Importante: instala o app base
 RUN yarn nocobase install
 
 EXPOSE 13000
 
-# Comando final para iniciar o NocoBase
+# Comando final para iniciar o NocoBase (e aí sim ele faz o build interno, em runtime)
 CMD ["yarn", "start"]
