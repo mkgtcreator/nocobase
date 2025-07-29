@@ -2,6 +2,7 @@
 FROM node:20-bookworm AS builder
 
 WORKDIR /app
+
 COPY . .
 
 # Instala dependências e faz o build
@@ -20,6 +21,9 @@ COPY --from=builder /app /app
 
 # ⚠️ NÃO use --production porque o NocoBase usa workspaces
 RUN yarn install --frozen-lockfile
+
+# ⚠️ ESSENCIAL — instala o app do NocoBase
+RUN yarn nocobase install
 
 EXPOSE 13000
 
