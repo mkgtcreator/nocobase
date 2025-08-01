@@ -20,8 +20,5 @@ RUN yarn install --frozen-lockfile
 
 EXPOSE 13000
 
-# 🔧 Rodando apenas o servidor para evitar falha no 'install'
-CMD ["yarn", "start"]
-
-# 📝 Caso queira testar o install manualmente depois, use:
-# CMD ["sh", "-c", "yarn nocobase install && yarn start"]
+# Tenta instalar e iniciar o projeto
+CMD ["sh", "-c", "yarn nocobase install && yarn start"]
