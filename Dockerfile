@@ -18,4 +18,4 @@ RUN yarn build
 
 EXPOSE 13000
 
-CMD ["sh", "-c", "yarn nocobase install && yarn start"]
+CMD ["yarn", "start"]
