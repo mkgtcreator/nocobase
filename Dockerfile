@@ -1,16 +1,13 @@
-# Base de build (mais leve e rápida)
+# Base de build
 FROM node:18-bullseye AS builder
 
 WORKDIR /app
 
-# Copia apenas arquivos de dependência primeiro (aproveita cache do Render)
-COPY package.json yarn.lock ./
-
-# Instala dependências (com cache)
-RUN yarn install --frozen-lockfile --ignore-optional
-
-# Copia o restante do projeto
+# Copia tudo (não só package.json), pois o postinstall precisa dos arquivos do projeto
 COPY . .
+
+# Instala dependências
+RUN yarn install --frozen-lockfile --ignore-optional
 
 # Build do projeto
 RUN yarn build
@@ -18,14 +15,15 @@ RUN yarn build
 # Imagem final
 FROM node:18-bullseye-slim
 
-# Instala cliente Postgres (necessário pro NocoBase conectar no DB)
+# Instala cliente Postgres
 RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copia apenas o necessário do builder
+# Copia a build do builder
 COPY --from=builder /app /app
 
 EXPOSE 13000
 
 CMD ["yarn", "start"]
+
