@@ -2,20 +2,14 @@
 FROM node:20-bullseye AS builder
 
 WORKDIR /app
-
-# Instala dependências necessárias para compilar módulos nativos
-RUN apt-get update && apt-get install -y \
-  python3 \
-  make \
-  g++ \
-  build-essential \
-  && rm -rf /var/lib/apt/lists/*
-
-# Copia apenas arquivos de dependências primeiro (para aproveitar cache)
 COPY package.json yarn.lock ./
 
-# Instala dependências (com suporte a binários nativos)
-RUN yarn install --frozen-lockfile --ignore-optional --ignore-scripts
+# Usa cache para dependências
+ENV YARN_CACHE_FOLDER=/tmp/.yarn-cache
+
+# Instala dependências e o NocoBase CLI
+RUN yarn install --frozen-lockfile --ignore-optional
+RUN yarn add nocobase --dev
 
 # Copia o restante do projeto
 COPY . .
@@ -26,10 +20,14 @@ RUN yarn run build
 # Etapa de produção
 FROM node:20-bullseye-slim
 
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /app
+
+# Copia somente o necessário da etapa de build
 COPY --from=builder /app /app
+
+# Instala client do Postgres (se precisar no runtime)
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 13000
 CMD ["yarn", "start"]
+
