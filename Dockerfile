@@ -21,7 +21,7 @@ RUN yarn install --frozen-lockfile --ignore-optional --ignore-scripts
 COPY . .
 
 # Compila o projeto
-RUN yarn build
+RUN yarn run build
 
 # Etapa de produção
 FROM node:20-bullseye-slim
