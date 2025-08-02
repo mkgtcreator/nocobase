@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 COPY package.json yarn.lock ./
 
 # Instala dependências (com suporte a binários nativos)
-RUN yarn install --frozen-lockfile --ignore-optional
+RUN yarn install --frozen-lockfile --ignore-optional --ignore-scripts
 
 # Copia o restante do projeto
 COPY . .
