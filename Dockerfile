@@ -1,9 +1,9 @@
 # Base de build
-FROM node:18-bullseye AS builder
+FROM node:20-bullseye AS builder
 
 WORKDIR /app
 
-# Copia tudo (não só package.json), pois o postinstall precisa dos arquivos do projeto
+# Copia tudo
 COPY . .
 
 # Instala dependências
@@ -13,7 +13,7 @@ RUN yarn install --frozen-lockfile --ignore-optional
 RUN yarn build
 
 # Imagem final
-FROM node:18-bullseye-slim
+FROM node:20-bullseye-slim
 
 # Instala cliente Postgres
 RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
@@ -26,4 +26,5 @@ COPY --from=builder /app /app
 EXPOSE 13000
 
 CMD ["yarn", "start"]
+
 
